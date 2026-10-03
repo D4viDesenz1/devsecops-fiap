@@ -1,21 +1,27 @@
 name: Security Scan
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 jobs:
   gitleaks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   semgrep:
     runs-on: ubuntu-latest
-    container:
-      image: semgrep/semgrep
+
     steps:
-      - uses: actions/checkout@v4
-      - run: semgrep ci --config auto
-        env:
-          SEMGREP_RULES: p/default
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Semgrep
+        run: pip install semgrep
+      - name: Run Semgrep
+        run: semgrep scan --config=auto .
